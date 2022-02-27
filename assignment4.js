@@ -23,7 +23,12 @@ export class Assignment4 extends Scene {
             box_2: new Cube(),
             axis: new Axis_Arrows()
         }
-        console.log(this.shapes.box_1.arrays.texture_coord)
+        
+
+        for(let x in this.shapes.box_2.arrays.texture_coord) {
+            this.shapes.box_2.arrays.texture_coord[x] = vec(this.shapes.box_2.arrays.texture_coord[x][0]*2, this.shapes.box_2.arrays.texture_coord[x][1]*2);
+        }
+        console.log(this.shapes.box_2.arrays.texture_coord)
 
 
         // TODO:  Create the materials required to texture both cubes with the correct images and settings.
@@ -33,10 +38,15 @@ export class Assignment4 extends Scene {
             phong: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
             }),
-            texture_1: new Material(new Textured_Phong(), {
+            texture: new Material(new Textured_Phong(), {
                 color: hex_color("#000000"),
                 ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/poptart.png", 'NEAREST')
+            }),
+            texture_2: new Material(new Textured_Phong(), {
+                color: hex_color("#000000"),
+                ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/pika.png", 'LINEAR_MIPMAP_LINEAR')
             }),
         }
 
@@ -65,8 +75,8 @@ export class Assignment4 extends Scene {
 
         // TODO:  Draw the required boxes. Also update their stored matrices.
         // You can remove the folloeing line.
-        this.shapes.box_1.draw(context, program_state, model_transform, this.materials.texture_1);
-        //this.shapes.box_2.draw(context, program_state, model_transform, this.materials.texture);
+        this.shapes.box_1.draw(context, program_state, model_transform.times(Mat4.translation(-2, 0, 0)), this.materials.texture);
+        this.shapes.box_2.draw(context, program_state, model_transform.times(Mat4.translation(2, 0, 0)), this.materials.texture_2);
     }
 }
 
