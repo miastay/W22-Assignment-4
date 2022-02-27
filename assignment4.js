@@ -33,10 +33,10 @@ export class Assignment4 extends Scene {
             phong: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
             }),
-            texture: new Material(new Textured_Phong(), {
-                color: hex_color("#ffffff"),
-                ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/stars.png")
+            texture_1: new Material(new Textured_Phong(), {
+                color: hex_color("#000000"),
+                ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/poptart.png", 'NEAREST')
             }),
         }
 
@@ -65,7 +65,8 @@ export class Assignment4 extends Scene {
 
         // TODO:  Draw the required boxes. Also update their stored matrices.
         // You can remove the folloeing line.
-        this.shapes.axis.draw(context, program_state, model_transform, this.materials.phong.override({color: hex_color("#ffff00")}));
+        this.shapes.box_1.draw(context, program_state, model_transform, this.materials.texture_1);
+        //this.shapes.box_2.draw(context, program_state, model_transform, this.materials.texture);
     }
 }
 
