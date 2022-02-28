@@ -38,7 +38,7 @@ export class Assignment4 extends Scene {
             phong: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
             }),
-            texture: new Material(new Textured_Phong(), {
+            texture: new Material(new Texture_Rotate(), {
                 color: hex_color("#000000"),
                 ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/poptart.png", 'NEAREST')
@@ -127,9 +127,20 @@ class Texture_Rotate extends Textured_Phong {
             varying vec2 f_tex_coord;
             uniform sampler2D texture;
             uniform float animation_time;
+            float at, ang;
+            vec2 f_tex_coord_mod;
+
             void main(){
                 // Sample the texture image in the correct place:
-                vec4 tex_color = texture2D( texture, f_tex_coord );
+                at += animation_time;
+                if(at > 60.0) { at -= 60.0; }
+
+                ang = 15.0 * 2.0 * 3.14159 * (at / 60.0);
+                f_tex_coord_mod = (f_tex_coord - vec2(0.5, 0.5)) * mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
+                f_tex_coord_mod = f_tex_coord_mod + 0.5;
+                
+
+                vec4 tex_color = texture2D( texture, f_tex_coord_mod );
                 if( tex_color.w < .01 ) discard;
                                                                          // Compute an initial (ambient) color:
                 gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
