@@ -43,7 +43,7 @@ export class Assignment4 extends Scene {
                 ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/poptart.png", 'NEAREST')
             }),
-            texture_2: new Material(new Textured_Phong(), {
+            texture_2: new Material(new Texture_Scroll_X(), {
                 color: hex_color("#000000"),
                 ambient: 1.0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/pika.png", 'LINEAR_MIPMAP_LINEAR')
@@ -102,10 +102,14 @@ class Texture_Scroll_X extends Textured_Phong {
             varying vec2 f_tex_coord;
             uniform sampler2D texture;
             uniform float animation_time;
+            float at;
             
             void main(){
                 // Sample the texture image in the correct place:
-                vec4 tex_color = texture2D( texture, f_tex_coord);
+                at += animation_time;
+                if(at > 10.0) { at -= 10.0; }
+                vec4 tex_color = texture2D( texture, f_tex_coord + vec2((at * 2.0), 0));
+
                 if( tex_color.w < .01 ) discard;
                                                                          // Compute an initial (ambient) color:
                 gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
