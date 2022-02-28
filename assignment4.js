@@ -91,6 +91,8 @@ export class Assignment4 extends Scene {
         this.shapes.box_2.draw(context, program_state, b1mt, this.materials.texture_2);
 
         if(this.rotating) this.last_ang += dt;
+        
+        console.log(program_state.animation_time / 1000)
     }
 }
 
@@ -102,20 +104,44 @@ class Texture_Scroll_X extends Textured_Phong {
             varying vec2 f_tex_coord;
             uniform sampler2D texture;
             uniform float animation_time;
-            float at;
-            
+            float at, ax, last;
+            vec2 f_tex_coord_mod;
+
+            float boxed(vec2 f_tex_coord_mod, vec2 v) {
+                if(f_tex_coord_mod.x < (0.85 + v.x) && f_tex_coord_mod.y < (0.85 + v.y)) {
+                    if(f_tex_coord_mod.x > (0.15 + v.x) && f_tex_coord_mod.y > (0.15 + v.y)) {
+                        if(f_tex_coord_mod.x < (0.25 + v.x) || f_tex_coord_mod.x > (0.75 + v.x) 
+                        || f_tex_coord_mod.y < (0.25 + v.y) || f_tex_coord_mod.y > (0.75 + v.y)) 
+                        {
+                            return 0.0;
+                        }
+                    }
+                }
+                return 1.0;
+            }
+
             void main(){
                 // Sample the texture image in the correct place:
-                at += animation_time;
-                if(at > 10.0) { at -= 10.0; }
-                vec4 tex_color = texture2D( texture, f_tex_coord + vec2((at * 2.0), 0));
+                
+                ax = mod(animation_time, 0.5);
+                f_tex_coord_mod = f_tex_coord - vec2(ax*2.0, 0);
+                vec4 tex_color = texture2D( texture, f_tex_coord_mod);
+
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(-1, 0));
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(-1, 1));
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(0, 0));
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(0, 1));
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(1, 0));
+                tex_color.xyz *= boxed(f_tex_coord_mod, vec2(1, 1));
 
                 if( tex_color.w < .01 ) discard;
                                                                          // Compute an initial (ambient) color:
                 gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
                                                                          // Compute the final color with contributions from lights:
                 gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
-        } `;
+                last = animation_time;
+            } 
+        `;
     }
 }
 
@@ -132,8 +158,7 @@ class Texture_Rotate extends Textured_Phong {
 
             void main(){
                 // Sample the texture image in the correct place:
-                at += animation_time;
-                if(at > 60.0) { at -= 60.0; }
+                at = mod(animation_time, 4.0);
 
                 ang = 15.0 * 2.0 * 3.14159 * (at / 60.0);
                 f_tex_coord_mod = (f_tex_coord - vec2(0.5, 0.5)) * mat2(cos(ang), sin(ang), -sin(ang), cos(ang));
@@ -141,6 +166,15 @@ class Texture_Rotate extends Textured_Phong {
                 
 
                 vec4 tex_color = texture2D( texture, f_tex_coord_mod );
+                if(f_tex_coord_mod.x < 0.85 && f_tex_coord_mod.y < 0.85) {
+                    if(f_tex_coord_mod.x > 0.15 && f_tex_coord_mod.y > 0.15) {
+                        if(f_tex_coord_mod.x < 0.25 || f_tex_coord_mod.x > 0.75
+                        || f_tex_coord_mod.y < 0.25 || f_tex_coord_mod.y > 0.75) 
+                        {
+                            tex_color = vec4(0, 0, 0, 1);
+                        }
+                    }
+                }
                 if( tex_color.w < .01 ) discard;
                                                                          // Compute an initial (ambient) color:
                 gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
