@@ -51,10 +51,15 @@ export class Assignment4 extends Scene {
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.last_ang = 0;
     }
 
     make_control_panel() {
         // TODO:  Implement requirement #5 using a key_triggered_button that responds to the 'c' key.
+        this.key_triggered_button("Start/Stop Rotation", ["Control", "0"], () => {
+            this.rotating = !this.rotating;
+        });
+        this.new_line();
     }
 
     display(context, program_state) {
@@ -73,10 +78,19 @@ export class Assignment4 extends Scene {
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
-        // TODO:  Draw the required boxes. Also update their stored matrices.
-        // You can remove the folloeing line.
-        this.shapes.box_1.draw(context, program_state, model_transform.times(Mat4.translation(-2, 0, 0)), this.materials.texture);
-        this.shapes.box_2.draw(context, program_state, model_transform.times(Mat4.translation(2, 0, 0)), this.materials.texture_2);
+        //  Box 1
+
+        //40pi  rad / 60sec
+        //60    rad / 60sec
+        let rpm = this.last_ang * Math.PI * (1/30);
+        let b1mt = model_transform.times(Mat4.translation(-2, 0, 0)).times(Mat4.rotation(20*rpm, 1, 0, 0));
+        this.shapes.box_1.draw(context, program_state, b1mt, this.materials.texture);
+
+        //  Box 2
+        b1mt = model_transform.times(Mat4.translation(2, 0, 0)).times(Mat4.rotation(30*rpm, 0, 1, 0));
+        this.shapes.box_2.draw(context, program_state, b1mt, this.materials.texture_2);
+
+        if(this.rotating) this.last_ang += dt;
     }
 }
 
