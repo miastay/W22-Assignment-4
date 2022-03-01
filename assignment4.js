@@ -56,7 +56,7 @@ export class Assignment4 extends Scene {
 
     make_control_panel() {
         // TODO:  Implement requirement #5 using a key_triggered_button that responds to the 'c' key.
-        this.key_triggered_button("Start/Stop Rotation", ["Control", "0"], () => {
+        this.key_triggered_button("Start/Stop Rotation", ["c"], () => {
             this.rotating = !this.rotating;
         });
         this.new_line();
